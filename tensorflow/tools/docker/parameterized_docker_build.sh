@@ -188,6 +188,34 @@ elif   [[ ${TF_DOCKER_BUILD_TYPE} == "gpu" ]]; then
   else
     ORIG_DOCKERFILE="${ORIG_DOCKERFILE}.gpu"
   fi
+elif   [[ ${TF_DOCKER_BUILD_TYPE} == "gpu-gdr" ]]; then
+  DOCKER_BINARY="nvidia-docker"
+
+  FINAL_TAG="${FINAL_TAG}-gpu-gdr"
+  if [[ ${ORIG_DOCKERFILE} == *"."* ]]; then
+    # There is already a dot in the tag, use "-"
+    ORIG_DOCKERFILE="${ORIG_DOCKERFILE}-gpu-gdr"
+  else
+    ORIG_DOCKERFILE="${ORIG_DOCKERFILE}.gpu-gdr"
+  fi
+  
+  if [[ ${TF_GITHUB_REPOURL} != "" ]]; then
+    TF_GITHUB_REPOURL="${TF_GITHUB_REPOURL}"
+  else 
+    die "ERROR: need TF_GITHUB_REPOURL that support gdr!"
+  fi
+
+  if [[ ${TF_GITHUB_USER} != "" ]]; then
+    TF_GITHUB_USER="${TF_GITHUB_USER}"
+  else 
+    die "ERROR: Private repo, need TF_GITBHUB_USER!"
+  fi
+
+  if [[ ${TF_GITHUB_PASSWD} != "" ]]; then
+    TF_GITHUB_PASSWD="${TF_GITHUB_PASSWD}"
+  else 
+    die "ERROR: Private repo, need TF_GITBHUB_PASSWD!"
+  fi
 else
   die "ERROR: Unrecognized value in TF_DOCKER_BUILD_TYPE: "\
 "${TF_DOCKER_BUILD_TYPE}"
@@ -403,6 +431,15 @@ else # TF_DOCKER_BUILD_IS_DEVEL == 'yes'
       fi
     fi
   fi
+fi
+
+# Modify repo user/passwd
+if [[ ${TF_DOCKER_BUILD_TYPE} == "gpu-gdr" ]]; then
+  # can not use / as delimiter, because in repourl there will be more /, and it will cause problem
+  sed -i -e "s#github_repourl#${TF_GITHUB_REPOURL}#g" "${DOCKERFILE}" && \
+  sed -i -e "s/github_branch/${TF_DOCKER_BUILD_DEVEL_BRANCH}/g" "${DOCKERFILE}" && \
+  sed -i -e "s/github_username/${TF_GITHUB_USER}/g" "${DOCKERFILE}" && \
+  sed -i -e "s/github_password/${TF_GITHUB_PASSWD}/g" "${DOCKERFILE}"
 fi
 
 # Perform docker build

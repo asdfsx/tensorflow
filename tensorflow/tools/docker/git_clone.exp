@@ -1,0 +1,15 @@
+set timeout -1
+set username   [lindex $argv 0]  
+set password   [lindex $argv 1]  
+set repourl    [lindex $argv 2]
+set repobranch [lindex $argv 3]
+set repodir    [lindex $argv 4]
+
+spawn git clone --branch $repobranch --depth=1 $repourl $repodir
+expect {
+    "Username for 'https://github.com':"      {send "$username\r\n"; exp_continue}
+    "Password for 'https://$username@github.com':"   {send "$password\r\n"; exp_continue}
+    "fatal: Authentication failed for"        {exit 1}
+    timeout                                   abort
+    EOF                                       {exit}
+}
