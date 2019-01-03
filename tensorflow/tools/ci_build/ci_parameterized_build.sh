@@ -263,6 +263,10 @@ function set_script_variable() {
   fi
 }
 
+# Process container supporting gdr
+if [[ ${CTYPE} == *gdr ]]; then
+  OPT_FLAG="${OPT_FLAG} --config=opt --config=gdr"
+fi
 
 # Process container type
 if [[ ${CTYPE} == cpu* ]] || [[ ${CTYPE} == "debian.jessie.cpu" ]]; then
