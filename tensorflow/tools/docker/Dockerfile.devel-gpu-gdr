@@ -150,7 +150,7 @@ RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/lib
         tensorflow/tools/pip_package:build_pip_package && \
     rm /usr/local/cuda/lib64/stubs/libcuda.so.1 && \
     bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/pip --gpudirect && \
-    pip --no-cache-dir install --upgrade /tmp/pip/tensorflow-*.whl && \
+    pip --no-cache-dir install --upgrade /tmp/pip/tensorflow_gpudirect-*.whl && \
     rm -rf /tmp/pip && \
     rm -rf /root/.cache
 # Clean up pip wheel and Bazel cache when done.
